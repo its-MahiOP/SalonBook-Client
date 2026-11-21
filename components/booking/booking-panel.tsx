@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
   CalendarDays,
@@ -40,8 +39,9 @@ export function BookingPanel({ service }: { service: Service }) {
   const user = session?.user
 
   const [date, setDate] = React.useState(tomorrowIso)
-  const [slots, setSlots] = React.useState<TimeSlot[]>([])
-  const [slotsLoading, setSlotsLoading] = React.useState(false)
+  const [slotData, setSlotData] = React.useState<{ date: string; slots: TimeSlot[] } | null>(
+    null
+  )
   const [selectedSlot, setSelectedSlot] = React.useState("")
   const [message, setMessage] = React.useState("")
   const [loading, setLoading] = React.useState(false)
@@ -50,24 +50,22 @@ export function BookingPanel({ service }: { service: Service }) {
   const [payLoading, setPayLoading] = React.useState(false)
 
   const today = todayIsoDate()
+  const isCustomer = user?.role === "customer"
+  const slots = slotData?.date === date ? slotData.slots : []
+  const slotsLoading = isCustomer && slotData?.date !== date
 
   React.useEffect(() => {
     if (!user || user.role !== "customer") return
     let active = true
-    setSlotsLoading(true)
-    setSelectedSlot("")
     apiFetch<ApiResponse<TimeSlot[]>>(
       `/api/appointments/available-slots?date=${encodeURIComponent(date)}`,
       { auth: false }
     )
       .then((response) => {
-        if (active) setSlots(response.data ?? [])
+        if (active) setSlotData({ date, slots: response.data ?? [] })
       })
       .catch(() => {
-        if (active) setSlots([])
-      })
-      .finally(() => {
-        if (active) setSlotsLoading(false)
+        if (active) setSlotData({ date, slots: [] })
       })
     return () => {
       active = false
@@ -95,10 +93,15 @@ export function BookingPanel({ service }: { service: Service }) {
         },
       })
       setCreated(response.data)
-      setSlots((current) =>
-        current.map((slot) =>
-          slot.time === selectedSlot ? { ...slot, available: false } : slot
-        )
+      setSlotData((current) =>
+        current && current.date === date
+          ? {
+              date: current.date,
+              slots: current.slots.map((slot) =>
+                slot.time === selectedSlot ? { ...slot, available: false } : slot
+              ),
+            }
+          : current
       )
       toast.success("Appointment requested — we will confirm it shortly.")
       router.refresh()
@@ -265,7 +268,10 @@ export function BookingPanel({ service }: { service: Service }) {
                 type="date"
                 min={today}
                 value={date}
-                onChange={(event) => setDate(event.target.value)}
+                onChange={(event) => {
+                  setSelectedSlot("")
+                  setDate(event.target.value)
+                }}
                 required
               />
             </div>

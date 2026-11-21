@@ -37,10 +37,18 @@ export function Navbar() {
   const [menuOpen, setMenuOpen] = React.useState(false)
   const menuRef = React.useRef<HTMLDivElement>(null)
 
-  React.useEffect(() => {
-    setMobileOpen(false)
-    setMenuOpen(false)
-  }, [pathname])
+  const [navPath, setNavPath] = React.useState(pathname)
+  const isMenuOpen = menuOpen && navPath === pathname
+  const isMobileOpen = mobileOpen && navPath === pathname
+
+  const setMenu = (open: boolean) => {
+    setNavPath(pathname)
+    setMenuOpen(open)
+  }
+  const setMobile = (open: boolean) => {
+    setNavPath(pathname)
+    setMobileOpen(open)
+  }
 
   React.useEffect(() => {
     function handleClick(event: MouseEvent) {
@@ -54,7 +62,7 @@ export function Navbar() {
 
   async function handleSignOut() {
     await authClient.signOut()
-    setMenuOpen(false)
+    setMenu(false)
     toast.success("You have been signed out")
     router.push("/")
     router.refresh()
@@ -108,9 +116,9 @@ export function Navbar() {
             <div className="relative" ref={menuRef}>
               <button
                 type="button"
-                onClick={() => setMenuOpen((open) => !open)}
+                onClick={() => setMenu(!isMenuOpen)}
                 aria-haspopup="menu"
-                aria-expanded={menuOpen}
+                aria-expanded={isMenuOpen}
                 className="flex items-center gap-2 rounded-full border border-border/80 bg-card py-1 pr-2.5 pl-1 text-left shadow-xs transition hover:border-primary/40"
               >
                 <Avatar src={user.image} name={user.name} size={32} />
@@ -120,12 +128,12 @@ export function Navbar() {
                 <ChevronDown
                   className={cn(
                     "size-3.5 text-muted-foreground transition-transform",
-                    menuOpen && "rotate-180"
+                    isMenuOpen && "rotate-180"
                   )}
                 />
               </button>
 
-              {menuOpen ? (
+              {isMenuOpen ? (
                 <div
                   role="menu"
                   className="absolute right-0 mt-2 w-60 overflow-hidden rounded-2xl border border-border bg-popover shadow-xl"
@@ -184,16 +192,16 @@ export function Navbar() {
             variant="ghost"
             size="icon-sm"
             className="rounded-full md:hidden"
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileOpen}
-            onClick={() => setMobileOpen((open) => !open)}
+            aria-label={isMobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMobileOpen}
+            onClick={() => setMobile(!isMobileOpen)}
           >
-            {mobileOpen ? <X /> : <Menu />}
+            {isMobileOpen ? <X /> : <Menu />}
           </Button>
         </div>
       </div>
 
-      {mobileOpen ? (
+      {isMobileOpen ? (
         <div className="border-t border-border/70 bg-background md:hidden">
           <div className="container-page flex flex-col gap-1 py-4">
             {publicLinks.map((link) => (

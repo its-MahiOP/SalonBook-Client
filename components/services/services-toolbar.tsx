@@ -19,11 +19,14 @@ export function ServicesToolbar({ total }: { total: number }) {
   const currentSort = searchParams.get("sort") || "newest"
 
   const [search, setSearch] = React.useState(currentSearch)
+  const [syncedSearch, setSyncedSearch] = React.useState(currentSearch)
   const [navigating, startTransition] = React.useTransition()
 
-  React.useEffect(() => {
+  // Keep the input in sync when the URL changes (back/forward navigation).
+  if (currentSearch !== syncedSearch) {
+    setSyncedSearch(currentSearch)
     setSearch(currentSearch)
-  }, [currentSearch])
+  }
 
   function updateParams(updates: Record<string, string | null>) {
     const params = new URLSearchParams(searchParams.toString())

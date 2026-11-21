@@ -23,12 +23,6 @@ export function Modal({
   footer?: React.ReactNode
   size?: "sm" | "md" | "lg"
 }) {
-  const [mounted, setMounted] = React.useState(false)
-
-  React.useEffect(() => {
-    setMounted(true)
-  }, [])
-
   React.useEffect(() => {
     if (!open) return
     const onKeyDown = (event: KeyboardEvent) => {
@@ -43,7 +37,7 @@ export function Modal({
     }
   }, [open, onClose])
 
-  if (!mounted || !open) return null
+  if (!open || typeof document === "undefined") return null
 
   const widths = {
     sm: "max-w-md",
