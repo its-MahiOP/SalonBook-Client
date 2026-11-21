@@ -7,14 +7,24 @@ export const metadata: Metadata = {
   description: "Sign in to your SalonBook account to manage appointments and payments.",
 }
 
-export default function SignInPage() {
+export default async function SignInPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ redirect?: string }>
+}) {
+  const params = await searchParams
+  const redirectTo =
+    params.redirect && params.redirect.startsWith("/") && !params.redirect.startsWith("//")
+      ? params.redirect
+      : undefined
+
   return (
     <AuthShell
       eyebrow="Welcome back"
       title="Sign in to SalonBook"
       description="Pick up where you left off — view your appointments, request a new treatment or complete a payment."
     >
-      <SignInForm />
+      <SignInForm redirectTo={redirectTo} />
     </AuthShell>
   )
 }

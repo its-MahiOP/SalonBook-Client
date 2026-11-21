@@ -13,7 +13,7 @@ import { PasswordInput } from "@/components/auth/password-input"
 import { GoogleIcon } from "@/components/auth/google-icon"
 import { Spinner } from "@/components/ui/loader"
 
-export function SignInForm() {
+export function SignInForm({ redirectTo }: { redirectTo?: string }) {
   const router = useRouter()
   const [email, setEmail] = React.useState("")
   const [password, setPassword] = React.useState("")
@@ -55,7 +55,9 @@ export function SignInForm() {
       }
 
       toast.success(`Welcome back, ${user.name.split(" ")[0]}!`)
-      router.push(user.role === "admin" ? "/dashboard/admin" : "/dashboard/customer")
+      router.push(
+        redirectTo || (user.role === "admin" ? "/dashboard/admin" : "/dashboard/customer")
+      )
       router.refresh()
     } catch {
       toast.error("Sign in failed. Please try again.")
@@ -69,7 +71,7 @@ export function SignInForm() {
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/dashboard",
+        callbackURL: redirectTo || "/dashboard",
         errorCallbackURL: "/sign-in",
       })
     } catch {
