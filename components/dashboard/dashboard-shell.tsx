@@ -7,6 +7,7 @@ import {
   CalendarDays,
   ChevronRight,
   LayoutDashboard,
+  Mail,
   Menu,
   ReceiptText,
   Scissors,
@@ -44,6 +45,7 @@ const adminNav: NavItem[] = [
   { href: "/dashboard/admin/services", label: "Services", icon: Scissors },
   { href: "/dashboard/admin/appointments", label: "Appointments", icon: CalendarDays },
   { href: "/dashboard/admin/users", label: "Customers", icon: Users },
+  { href: "/dashboard/admin/messages", label: "Messages", icon: Mail },
   { href: "/dashboard/admin/transactions", label: "Transactions", icon: ReceiptText },
   { href: "/dashboard/admin/profile", label: "My Profile", icon: UserRound },
 ]
