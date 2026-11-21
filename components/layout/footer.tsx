@@ -14,8 +14,8 @@ import { SALON_INFO } from "@/lib/constants"
 const exploreLinks = [
   { href: "/", label: "Home" },
   { href: "/services", label: "Browse Services" },
-  { href: "/sign-in", label: "Sign In" },
-  { href: "/sign-up", label: "Create Account" },
+  { href: "/about", label: "About Us" },
+  { href: "/contact", label: "Contact" },
 ]
 
 const quickLinks = [
@@ -23,6 +23,11 @@ const quickLinks = [
   { href: "/services?category=Haircut%20%26%20Styling", label: "Haircut & Styling" },
   { href: "/services?category=Facial%20%26%20Skincare", label: "Facial & Skincare" },
   { href: "/services?category=Spa%20%26%20Massage", label: "Spa & Massage" },
+]
+
+const legalLinks = [
+  { href: "/privacy", label: "Privacy Policy" },
+  { href: "/terms", label: "Terms of Service" },
 ]
 
 export function Footer() {
@@ -134,11 +139,17 @@ export function Footer() {
       </div>
 
       <div className="border-t border-white/10">
-        <div className="container-page flex flex-col items-center justify-between gap-2 py-5 text-xs text-white/45 sm:flex-row">
+        <div className="container-page flex flex-col items-center justify-between gap-3 py-5 text-xs text-white/45 sm:flex-row">
           <p>
             © {new Date().getFullYear()} {SALON_INFO.name}. All rights reserved.
           </p>
-          <p>Designed with care for beautiful, confident days.</p>
+          <div className="flex items-center gap-4">
+            {legalLinks.map((link) => (
+              <Link key={link.href} href={link.href} className="transition hover:text-white">
+                {link.label}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </footer>
