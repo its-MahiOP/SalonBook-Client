@@ -4,7 +4,7 @@ import { mongodbAdapter } from "@better-auth/mongo-adapter"
 import { jwt } from "better-auth/plugins"
 
 const client = new MongoClient(process.env.DB_URI as string)
-const db = client.db("SalonBook")
+const db = client.db(process.env.DB_NAME || "SalonBook")
 
 const appUrl = process.env.BETTER_AUTH_URL || "http://localhost:3000"
 

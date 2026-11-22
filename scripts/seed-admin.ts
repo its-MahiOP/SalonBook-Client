@@ -42,7 +42,7 @@ try {
 const client = new MongoClient(process.env.DB_URI as string)
 try {
   await client.connect()
-  const db = client.db("SalonBook")
+  const db = client.db(process.env.DB_NAME || "SalonBook")
   const result = await db
     .collection("user")
     .updateOne({ email }, { $set: { role: "admin", isBlocked: false } })

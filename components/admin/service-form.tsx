@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
-import { ArrowLeft, ImagePlus, Link2, Save, UploadCloud } from "lucide-react"
+import { ArrowLeft, ImagePlus, Save, UploadCloud } from "lucide-react"
 import { toast } from "sonner"
 
 import { apiFetch, ApiError } from "@/lib/api"
@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button"
 import { Input, Label, Textarea, Select, FieldError } from "@/components/ui/form-controls"
 import { Spinner } from "@/components/ui/loader"
 import { LinkButton } from "@/components/ui/link-button"
-import { cn } from "@/lib/utils"
 
 export function ServiceForm({ service }: { service?: Service }) {
   const router = useRouter()
@@ -30,13 +29,11 @@ export function ServiceForm({ service }: { service?: Service }) {
     service?.status ?? "active"
   )
   const [image, setImage] = React.useState(service?.image ?? "")
-  const [imageMode, setImageMode] = React.useState<"upload" | "url">("upload")
-  const [imageUrl, setImageUrl] = React.useState(service?.image ?? "")
   const [uploading, setUploading] = React.useState(false)
   const [saving, setSaving] = React.useState(false)
   const [errors, setErrors] = React.useState<Record<string, string>>({})
 
-  const preview = image || (imageMode === "url" ? imageUrl : "")
+  const preview = image
 
   async function handleFile(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
@@ -51,7 +48,6 @@ export function ServiceForm({ service }: { service?: Service }) {
     try {
       const url = await uploadImage(file, "service")
       setImage(url)
-      setImageMode("upload")
       toast.success("Image uploaded")
     } catch (uploadError) {
       toast.error(uploadError instanceof Error ? uploadError.message : "Upload failed")
@@ -76,9 +72,9 @@ export function ServiceForm({ service }: { service?: Service }) {
     if (!Number.isInteger(durationNumber) || durationNumber <= 0 || durationNumber > 720) {
       nextErrors.duration = "Duration must be between 1 and 720 minutes"
     }
-    const finalImage = imageMode === "url" ? imageUrl.trim() : image
-    if (!finalImage) nextErrors.image = "Please upload an image or paste an image URL"
-    else if (!/^https?:\/\/.+/i.test(finalImage)) nextErrors.image = "Enter a valid image URL"
+    if (!image) {
+      nextErrors.image = "Please upload a service image"
+    }
 
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length > 0) return
@@ -91,7 +87,7 @@ export function ServiceForm({ service }: { service?: Service }) {
         description: description.trim(),
         price: priceNumber,
         duration: durationNumber,
-        image: finalImage,
+        image,
         status,
       }
       if (editing && service) {
@@ -233,34 +229,10 @@ export function ServiceForm({ service }: { service?: Service }) {
       <div className="surface-card h-fit p-5 sm:p-6">
         <h2 className="text-lg font-semibold">Service image</h2>
         <p className="text-xs text-muted-foreground">
-          A beautiful photo helps guests choose this treatment.
+          Upload a high-quality photo for this treatment (stored securely on ImgBB).
         </p>
 
-        <div className="mt-4 flex gap-1 rounded-lg bg-muted p-1">
-          {[
-            { id: "upload" as const, label: "Upload", icon: UploadCloud },
-            { id: "url" as const, label: "Image URL", icon: Link2 },
-          ].map((mode) => {
-            const Icon = mode.icon
-            return (
-              <button
-                key={mode.id}
-                type="button"
-                onClick={() => setImageMode(mode.id)}
-                className={cn(
-                  "inline-flex flex-1 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium transition",
-                  imageMode === mode.id
-                    ? "bg-card text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <Icon className="size-3.5" /> {mode.label}
-              </button>
-            )
-          })}
-        </div>
-
-        <div className="mt-3">
+        <div className="mt-4">
           {preview ? (
             <div className="relative aspect-[4/3] overflow-hidden rounded-xl border border-border bg-muted">
               <Image src={preview} alt="Service preview" fill sizes="400px" className="object-cover" />
@@ -268,47 +240,33 @@ export function ServiceForm({ service }: { service?: Service }) {
           ) : (
             <div className="flex aspect-[4/3] flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-border bg-card/60 text-center">
               <ImagePlus className="size-6 text-primary" />
-              <p className="text-xs font-medium">No image selected yet</p>
+              <p className="text-xs font-medium">No image uploaded yet</p>
             </div>
           )}
         </div>
 
         <div className="mt-3">
-          {imageMode === "upload" ? (
-            <>
-              <Button
-                type="button"
-                variant="outline"
-                className="h-10 w-full gap-2"
-                disabled={uploading}
-                onClick={() => fileRef.current?.click()}
-              >
-                {uploading ? <Spinner /> : <ImagePlus className="size-4" />}
-                {uploading ? "Uploading…" : preview ? "Replace image" : "Upload image"}
-              </Button>
-              <input
-                ref={fileRef}
-                type="file"
-                accept="image/jpeg,image/png,image/webp,image/gif"
-                onChange={handleFile}
-                className="hidden"
-              />
-              <p className="mt-1.5 text-[11px] text-muted-foreground">
-                JPG, PNG, WEBP or GIF up to 5 MB.
-              </p>
-            </>
-          ) : (
-            <>
-              <Input
-                type="url"
-                value={imageUrl}
-                onChange={(event) => setImageUrl(event.target.value)}
-                placeholder="https://example.com/service.jpg"
-                aria-invalid={Boolean(errors.image)}
-              />
-              <FieldError>{errors.image}</FieldError>
-            </>
-          )}
+          <Button
+            type="button"
+            variant="outline"
+            className="h-10 w-full gap-2"
+            disabled={uploading}
+            onClick={() => fileRef.current?.click()}
+          >
+            {uploading ? <Spinner /> : <UploadCloud className="size-4" />}
+            {uploading ? "Uploading to ImgBB…" : preview ? "Replace image (upload)" : "Upload image"}
+          </Button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            onChange={handleFile}
+            className="hidden"
+          />
+          <FieldError>{errors.image}</FieldError>
+          <p className="mt-1.5 text-[11px] text-muted-foreground">
+            JPG, PNG, WEBP or GIF up to 5 MB. Uploaded directly to ImgBB.
+          </p>
         </div>
 
         <Button

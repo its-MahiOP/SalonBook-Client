@@ -4,7 +4,13 @@ A complete salon appointment booking front end built with **Next.js 16 (App Rout
 
 Guests can browse the service menu, check live availability, request an appointment and pay online. Customers manage their own bookings and profile; salon administrators manage services, approve appointments, block abusive accounts and review revenue.
 
-> The REST API lives in a separate repository: **SalonBook Server** (Express + MongoDB + Stripe).
+---
+
+## Project Links
+
+- **Live Website Link:** [https://salonbook-client.vercel.app](https://salonbook-client.vercel.app) *(update with your live deployed URL)*
+- **Client Repository Link:** [https://github.com/its-MahiOP/SalonBook-Client](https://github.com/its-MahiOP/SalonBook-Client)
+- **Server Repository Link:** [https://github.com/its-MahiOP/SalonBook-Server](https://github.com/its-MahiOP/SalonBook-Server)
 
 ---
 
