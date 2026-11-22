@@ -4,6 +4,7 @@ import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
 import {
+  CalendarClock,
   CalendarDays,
   CalendarPlus,
   Check,
@@ -23,6 +24,7 @@ import { Badge, AppointmentStatusBadge, PaymentStatusBadge } from "@/components/
 import { Button } from "@/components/ui/button"
 import { ConfirmDialog } from "@/components/ui/modal"
 import { PayButton } from "@/components/payments/pay-button"
+import { RescheduleDialog } from "@/components/dashboard/reschedule-dialog"
 
 export function AppointmentCard({
   appointment,
@@ -35,6 +37,7 @@ export function AppointmentCard({
 }) {
   const [busy, setBusy] = React.useState(false)
   const [confirm, setConfirm] = React.useState<null | "confirm" | "cancel">(null)
+  const [reschedule, setReschedule] = React.useState(false)
   const service = appointment.service
   const customer = appointment.customer
 
@@ -159,6 +162,18 @@ export function AppointmentCard({
                     <X className="size-3.5" /> Cancel
                   </Button>
                 ) : null}
+                {appointment.status !== "cancelled" && appointment.paymentStatus === "unpaid" ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="gap-1.5"
+                    onClick={() => setReschedule(true)}
+                    disabled={busy}
+                  >
+                    <CalendarClock className="size-3.5" /> Reschedule
+                  </Button>
+                ) : null}
                 {appointment.paymentStatus === "paid" ? (
                   <Badge variant="success" dot>
                     Payment received
@@ -183,6 +198,18 @@ export function AppointmentCard({
                     className="gap-1.5 text-destructive"
                   >
                     <X className="size-3.5" /> Cancel request
+                  </Button>
+                ) : null}
+                {appointment.status === "pending" ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="gap-1.5"
+                    onClick={() => setReschedule(true)}
+                    disabled={busy}
+                  >
+                    <CalendarClock className="size-3.5" /> Reschedule
                   </Button>
                 ) : null}
                 {appointment.status === "confirmed" && appointment.paymentStatus === "paid" ? (
@@ -219,6 +246,13 @@ export function AppointmentCard({
           </div>
         </div>
       </div>
+
+      <RescheduleDialog
+        appointment={appointment}
+        open={reschedule}
+        onClose={() => setReschedule(false)}
+        onChanged={onChanged}
+      />
 
       <ConfirmDialog
         open={confirm !== null}
