@@ -1,15 +1,18 @@
 "use client"
 
 import * as React from "react"
-import { CircleDollarSign, ReceiptText, Search, X } from "lucide-react"
+import { CircleDollarSign, Download, ReceiptText, Search, X } from "lucide-react"
+import { toast } from "sonner"
 
 import { useApiData } from "@/lib/hooks/use-api-data"
 import type { ApiResponse, Transaction } from "@/lib/types"
 import { formatCurrency, formatDateTime, shortId } from "@/lib/format"
+import { downloadCsv } from "@/lib/csv"
 import { PageHeader, EmptyState } from "@/components/ui/section"
 import { Input } from "@/components/ui/form-controls"
 import { Avatar } from "@/components/ui/avatar"
 import { TransactionStatusBadge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { TableSkeleton } from "@/components/ui/loader"
 
 export default function AdminTransactionsPage() {
@@ -33,11 +36,59 @@ export default function AdminTransactionsPage() {
     )
   })
 
+  function exportCsv() {
+    if (visible.length === 0) {
+      toast.error("There are no transactions to export")
+      return
+    }
+
+    const rows: unknown[][] = [
+      [
+        "Customer",
+        "Email",
+        "Treatment",
+        "Appointment date",
+        "Time slot",
+        "Paid on",
+        "Stripe session",
+        "Amount",
+        "Currency",
+        "Status",
+      ],
+      ...visible.map((transaction) => [
+        transaction.customer?.name ?? "Deleted customer",
+        transaction.customer?.email ?? "",
+        transaction.service?.serviceName ?? "",
+        transaction.appointment?.appointmentDate ?? "",
+        transaction.appointment?.timeSlot ?? "",
+        formatDateTime(transaction.createdAt),
+        transaction.stripeSessionId,
+        transaction.amount,
+        (transaction.currency || "usd").toUpperCase(),
+        transaction.status,
+      ]),
+    ]
+
+    downloadCsv(`salonbook-transactions-${new Date().toISOString().slice(0, 10)}.csv`, rows)
+    toast.success(`Exported ${visible.length} transaction${visible.length === 1 ? "" : "s"}`)
+  }
+
   return (
     <div className="space-y-6">
       <PageHeader
         title="Transactions"
         description="Verified Stripe payments recorded against confirmed salon appointments."
+        action={
+          <Button
+            type="button"
+            variant="outline"
+            className="h-9 gap-2"
+            onClick={exportCsv}
+            disabled={loading || visible.length === 0}
+          >
+            <Download className="size-4" /> Export CSV
+          </Button>
+        }
       />
 
       <div className="grid gap-4 sm:grid-cols-2">
