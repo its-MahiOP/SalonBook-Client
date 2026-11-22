@@ -1,7 +1,8 @@
 import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
-import { notFound } from "next/navigation"
+import { headers } from "next/headers"
+import { notFound, redirect } from "next/navigation"
 import {
   ArrowLeft,
   Check,
@@ -12,6 +13,7 @@ import {
   Sparkles,
 } from "lucide-react"
 
+import { auth } from "@/lib/auth"
 import { PublicShell } from "@/components/layout/public-shell"
 import { BookingPanel } from "@/components/booking/booking-panel"
 import { ServiceCard } from "@/components/services/service-card"
@@ -53,6 +55,13 @@ const promises = [
 
 export default async function ServiceDetailPage({ params }: { params: Params }) {
   const { id } = await params
+
+  // Protected route requirement: redirect unauthenticated users to Sign In
+  const session = await auth.api.getSession({ headers: await headers() })
+  if (!session?.user) {
+    redirect(`/sign-in?redirect=/services/${id}`)
+  }
+
   const service = await getService(id)
   if (!service) notFound()
 
