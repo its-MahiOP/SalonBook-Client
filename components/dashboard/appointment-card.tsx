@@ -127,6 +127,10 @@ export function AppointmentCard({
               <Scissors className="size-3.5 text-primary" />
               {formatCurrency(appointment.servicePrice)}
             </span>
+            <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+              <CalendarClock className="size-3.5 text-primary" />
+              Requested {formatDate(appointment.createdAt)}
+            </span>
           </div>
 
           {appointment.message ? (

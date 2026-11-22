@@ -11,6 +11,7 @@ import {
   Sparkles,
   Timer,
   Wallet,
+  XCircle,
 } from "lucide-react"
 
 import { authClient } from "@/lib/auth-client"
@@ -41,8 +42,8 @@ export default function CustomerOverviewPage() {
       />
 
       {loading ? (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, index) => (
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+          {Array.from({ length: 5 }).map((_, index) => (
             <div key={index} className="h-24 animate-pulse rounded-2xl bg-muted" />
           ))}
         </div>
@@ -55,29 +56,35 @@ export default function CustomerOverviewPage() {
         </div>
       ) : (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             <StatCard
-              label="All appointments"
+              label="Total Appointment Requests"
               value={stats?.total ?? 0}
               icon={CalendarDays}
               hint="Every request you have made"
             />
             <StatCard
-              label="Awaiting confirmation"
+              label="Pending Appointments"
               value={stats?.pending ?? 0}
               icon={Timer}
               tone="gold"
               hint="The salon is reviewing these"
             />
             <StatCard
-              label="Confirmed"
+              label="Confirmed Appointments"
               value={stats?.confirmed ?? 0}
               icon={CheckCircle2}
               tone="green"
               hint="Ready for your visit"
             />
             <StatCard
-              label="Total spent"
+              label="Cancelled Appointments"
+              value={stats?.cancelled ?? 0}
+              icon={XCircle}
+              hint="Cancelled bookings"
+            />
+            <StatCard
+              label="Lifetime Spend"
               value={formatCurrency(stats?.totalSpent ?? 0)}
               icon={Wallet}
               tone="plum"

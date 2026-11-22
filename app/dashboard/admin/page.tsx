@@ -5,6 +5,7 @@ import {
   ArrowRight,
   CalendarDays,
   CalendarPlus,
+  CheckCircle2,
   CircleDollarSign,
   Clock3,
   Scissors,
@@ -41,8 +42,8 @@ export default function AdminOverviewPage() {
       />
 
       {loading ? (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, index) => (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          {Array.from({ length: 6 }).map((_, index) => (
             <div key={index} className="h-24 animate-pulse rounded-2xl bg-muted" />
           ))}
         </div>
@@ -55,33 +56,47 @@ export default function AdminOverviewPage() {
         </div>
       ) : (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
             <StatCard
-              label="Total revenue"
-              value={formatCurrency(stats?.totalRevenue ?? 0)}
-              icon={CircleDollarSign}
-              tone="green"
-              hint={`${stats?.totalSuccessfulPayments ?? 0} successful payments`}
-            />
-            <StatCard
-              label="Appointments"
-              value={stats?.totalAppointments ?? 0}
-              icon={CalendarDays}
-              hint={`${stats?.confirmed ?? 0} confirmed · ${stats?.pending ?? 0} pending`}
-            />
-            <StatCard
-              label="Awaiting review"
-              value={stats?.pending ?? 0}
-              icon={Clock3}
-              tone="gold"
-              hint="Confirm or cancel requests"
-            />
-            <StatCard
-              label="Customers"
+              label="Registered Customers"
               value={stats?.totalCustomers ?? 0}
               icon={Users}
               tone="blue"
-              hint={`${stats?.activeServices ?? 0} active services`}
+              hint="Active client accounts"
+            />
+            <StatCard
+              label="Active Services"
+              value={stats?.activeServices ?? 0}
+              icon={Scissors}
+              tone="plum"
+              hint="Bookable treatments"
+            />
+            <StatCard
+              label="Appointment Requests"
+              value={stats?.totalAppointments ?? 0}
+              icon={CalendarDays}
+              hint="All bookings received"
+            />
+            <StatCard
+              label="Pending Appointments"
+              value={stats?.pending ?? 0}
+              icon={Clock3}
+              tone="gold"
+              hint="Awaiting admin review"
+            />
+            <StatCard
+              label="Confirmed Appointments"
+              value={stats?.confirmed ?? 0}
+              icon={CheckCircle2}
+              tone="green"
+              hint="Approved bookings"
+            />
+            <StatCard
+              label="Successful Payments"
+              value={stats?.totalSuccessfulPayments ?? 0}
+              icon={CircleDollarSign}
+              tone="green"
+              hint={`${formatCurrency(stats?.totalRevenue ?? 0)} total revenue`}
             />
           </div>
 

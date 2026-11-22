@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Search, ShieldBan, ShieldCheck, Users, X } from "lucide-react"
+import { Eye, Search, ShieldBan, ShieldCheck, Users, X } from "lucide-react"
 import { toast } from "sonner"
 
 import { apiFetch, ApiError } from "@/lib/api"
@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/form-controls"
 import { Button } from "@/components/ui/button"
 import { Avatar } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { ConfirmDialog } from "@/components/ui/modal"
+import { ConfirmDialog, Modal } from "@/components/ui/modal"
 import { TableSkeleton } from "@/components/ui/loader"
 
 type AdminUser = SessionUser & { createdAt?: string; appointmentCount: number }
@@ -22,6 +22,7 @@ export default function AdminUsersPage() {
   const { data, loading, error, reload } = useApiData<ApiResponse<AdminUser[]>>("/api/users")
   const [search, setSearch] = React.useState("")
   const [target, setTarget] = React.useState<AdminUser | null>(null)
+  const [viewUser, setViewUser] = React.useState<AdminUser | null>(null)
   const [busy, setBusy] = React.useState(false)
 
   const users = data?.data ?? []
@@ -140,7 +141,17 @@ export default function AdminUsersPage() {
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex justify-end">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setViewUser(user)}
+                          className="gap-1.5"
+                          title="View customer details"
+                        >
+                          <Eye className="size-3.5" /> View
+                        </Button>
                         <Button
                           type="button"
                           size="sm"
@@ -195,6 +206,76 @@ export default function AdminUsersPage() {
         }
         confirmLabel={target?.isBlocked ? "Unblock customer" : "Block customer"}
       />
+
+      <Modal
+        open={Boolean(viewUser)}
+        onClose={() => setViewUser(null)}
+        title="Customer details"
+        description="Full profile information and booking activity for this registered customer."
+      >
+        {viewUser ? (
+          <div className="space-y-5">
+            <div className="flex items-center gap-4 rounded-2xl bg-muted/60 p-4">
+              <Avatar src={viewUser.image} name={viewUser.name} size={54} />
+              <div className="min-w-0 flex-1">
+                <h3 className="truncate text-base font-semibold">{viewUser.name}</h3>
+                <p className="truncate text-xs text-muted-foreground">{viewUser.email}</p>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <span className="inline-flex rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold tracking-wider text-primary uppercase">
+                    {viewUser.role}
+                  </span>
+                  {viewUser.isBlocked ? (
+                    <Badge variant="danger" dot>
+                      Blocked
+                    </Badge>
+                  ) : (
+                    <Badge variant="success" dot>
+                      Active
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2 text-sm">
+              <div className="rounded-xl border border-border/70 p-3.5">
+                <p className="text-xs font-semibold text-muted-foreground uppercase">Phone Number</p>
+                <p className="mt-1 font-medium">{viewUser.phone || "Not provided"}</p>
+              </div>
+              <div className="rounded-xl border border-border/70 p-3.5">
+                <p className="text-xs font-semibold text-muted-foreground uppercase">Date Registered</p>
+                <p className="mt-1 font-medium">
+                  {viewUser.createdAt ? formatDate(viewUser.createdAt) : "—"}
+                </p>
+              </div>
+              <div className="rounded-xl border border-border/70 p-3.5">
+                <p className="text-xs font-semibold text-muted-foreground uppercase">Total Appointments</p>
+                <p className="mt-1 text-lg font-semibold">{viewUser.appointmentCount}</p>
+              </div>
+              <div className="rounded-xl border border-border/70 p-3.5">
+                <p className="text-xs font-semibold text-muted-foreground uppercase">Account Status</p>
+                <p className="mt-1 font-medium">
+                  {viewUser.isBlocked ? "Blocked from booking" : "In good standing"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <Button
+                type="button"
+                variant={viewUser.isBlocked ? "default" : "destructive"}
+                size="sm"
+                onClick={() => {
+                  setTarget(viewUser)
+                  setViewUser(null)
+                }}
+              >
+                {viewUser.isBlocked ? "Unblock this customer" : "Block this customer"}
+              </Button>
+            </div>
+          </div>
+        ) : null}
+      </Modal>
     </div>
   )
 }
