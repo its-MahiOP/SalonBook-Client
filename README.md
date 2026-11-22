@@ -8,7 +8,7 @@ Guests can browse the service menu, check live availability, request an appointm
 
 ## Project Links
 
-- **Live Website Link:** [https://salonbook-client.vercel.app](https://salonbook-client.vercel.app) *(update with your live deployed URL)*
+- **Live Website Link:** [https://salon-book-client-cyan.vercel.app](https://salon-book-client-cyan.vercel.app) *(update with your live deployed URL)*
 - **Client Repository Link:** [https://github.com/its-MahiOP/SalonBook-Client](https://github.com/its-MahiOP/SalonBook-Client)
 - **Server Repository Link:** [https://github.com/its-MahiOP/SalonBook-Server](https://github.com/its-MahiOP/SalonBook-Server)
 
