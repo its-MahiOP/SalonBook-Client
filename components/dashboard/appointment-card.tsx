@@ -5,6 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import {
   CalendarDays,
+  CalendarPlus,
   Check,
   Clock3,
   MessageSquareText,
@@ -17,6 +18,7 @@ import { toast } from "sonner"
 import { apiFetch, ApiError } from "@/lib/api"
 import type { Appointment } from "@/lib/types"
 import { formatCurrency, formatDate, formatDuration } from "@/lib/format"
+import { downloadAppointmentIcs } from "@/lib/calendar"
 import { Badge, AppointmentStatusBadge, PaymentStatusBadge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ConfirmDialog } from "@/components/ui/modal"
@@ -187,6 +189,24 @@ export function AppointmentCard({
                   <Badge variant="success" dot>
                     Paid · thank you
                   </Badge>
+                ) : null}
+                {appointment.status !== "cancelled" ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="gap-1.5"
+                    onClick={() => {
+                      const saved = downloadAppointmentIcs(appointment)
+                      if (saved) {
+                        toast.success("Calendar file downloaded")
+                      } else {
+                        toast.error("Could not create a calendar file for this booking")
+                      }
+                    }}
+                  >
+                    <CalendarPlus className="size-3.5" /> Add to calendar
+                  </Button>
                 ) : null}
                 <Link
                   href={`/services/${service?.id ?? appointment.serviceId}`}
