@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic"
 
 export default async function HomePage() {
   const [servicesResponse, categoriesResponse] = await Promise.all([
-    publicApiFetch<ApiResponse<Service[]>>("/api/services?limit=6&sort=newest"),
+    publicApiFetch<ApiResponse<Service[]>>("/api/services?limit=6&sort=popular"),
     publicApiFetch<ApiResponse<ServiceCategory[]>>("/api/services/categories"),
   ])
 

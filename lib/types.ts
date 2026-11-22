@@ -19,6 +19,8 @@ export type Service = {
   duration: number
   image: string
   status: "active" | "inactive"
+  /** Present when the API sorts by popularity. */
+  bookings?: number
   createdAt: string
   updatedAt?: string
 }

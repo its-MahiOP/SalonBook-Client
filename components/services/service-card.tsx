@@ -1,6 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowRight, Clock3 } from "lucide-react"
+import { ArrowRight, Clock3, TrendingUp } from "lucide-react"
 import type { Service } from "@/lib/types"
 import { formatCurrency, formatDuration } from "@/lib/format"
 import { Badge } from "@/components/ui/badge"
@@ -48,10 +48,21 @@ export function ServiceCard({ service, priority = false }: { service: Service; p
         </p>
 
         <div className="mt-auto flex items-center justify-between gap-3 border-t border-border/70 pt-3.5">
-          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-            <Clock3 className="size-3.5 text-primary" />
-            {formatDuration(service.duration)}
-          </span>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+              <Clock3 className="size-3.5 text-primary" />
+              {formatDuration(service.duration)}
+            </span>
+            {service.bookings ? (
+              <span
+                className="inline-flex items-center gap-1 text-xs font-medium text-primary"
+                title={`${service.bookings} appointment${service.bookings === 1 ? "" : "s"} booked`}
+              >
+                <TrendingUp className="size-3.5" />
+                {service.bookings} booked
+              </span>
+            ) : null}
+          </div>
           <Link
             href={`/services/${service.id}`}
             className="inline-flex items-center gap-1 text-sm font-semibold text-primary transition hover:gap-1.5"
